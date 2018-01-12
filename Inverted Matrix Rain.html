@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--source https://github.com/hangcs -->
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="telephone=no" name="format-detection">
+  <meta content="email=no" name="format-detection">
+  <title>Martrix Rain</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    // geting canvas by id c
+    var c = document.getElementById("c");
+    var ctx = c.getContext("2d");
+    var kano; //set it for Katakana
+    var matrix; ////set it for all the characters
+
+    //making the canvas full screen
+    c.height = window.innerHeight;
+    c.width = window.innerWidth;
+    //English characters and symbols - taken from the unicode charset
+    var num = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@#$%^&*()_+-={}|<>?[];',./123456789";
+    //looping through the Katakana unicode and added them up to kano strings
+    for (var i = 12448; i < 12544; i++) {
+      kano = kano + String.fromCharCode(i);
+    }
+    //combine all the characters in to Matrix
+    matrix = kano + num;
+    //converting the string into an array of single characters
+    matrix = matrix.split("");
+    var font_size = 20;
+    var columns = c.width / font_size; //number of columns for the rain
+    //an array of drops - one per column
+    var drops = [];
+    //x below is the x coordinate
+    //1 = y co-ordinate of the drop(same for every drop initially)
+    for (var x = 0; x < columns; x++)
+      drops[x] = 1;
+    //invert the canvas
+    ctx.translate(c.width, 0);
+    ctx.scale(-1, 1);
+    //drawing the characters
+    function draw() { //Black background for the canvas
+      //translucent background to show trail
+      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = "#0F0"; //green text italic arial
+      ctx.font = font_size + "px astral";
+      //looping over drops
+      for (var i = 0; i < drops.length; i++) {
+        //a random character to print
+        var text = matrix[Math.floor(Math.random() * matrix.length)];
+        //x = i*font_size, y = value of drops[i]*font_size
+        ctx.fillText(text, i * font_size, drops[i] * font_size);
+        //sending the drop back to the top randomly after it has crossed the screen
+        //adding a randomness to the reset to make the drops scattered on the Y axis
+        if (drops[i] * font_size > c.height && Math.random() > 0.975)
+          drops[i] = 0;
+        //incrementing Y coordinate
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 33);
+  </script>
+</body>
+
+</html>
